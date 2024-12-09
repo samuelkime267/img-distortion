@@ -2,32 +2,27 @@
 
 import * as THREE from "three";
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import fragmentShader from "../shader/fragment.glsl";
 import vertexShader from "../shader/vertex.glsl";
-import { ShaderMaterial } from "three";
+import useImageDistortion from "../hooks/useImageDistortion";
 
 const Experience = () => {
-  const shaderMaterialRef = useRef<ShaderMaterial>(null);
-  useFrame((state, deltaTime) => {
-    if (!shaderMaterialRef.current) return;
-    shaderMaterialRef.current.uniforms.time.value += 0.05;
-  });
+  const shaderMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+  const { uniforms } = useImageDistortion(shaderMaterialRef, meshRef);
 
   return (
     <>
-      <OrbitControls />
-
-      <mesh>
+      <color attach={"background"} args={["#f6ead7"]} />
+      <mesh ref={meshRef}>
         <shaderMaterial
           ref={shaderMaterialRef}
-          uniforms={{ time: { value: 0 } }}
-          side={THREE.DoubleSide}
+          uniforms={uniforms}
           fragmentShader={fragmentShader}
           vertexShader={vertexShader}
+          transparent
         />
-        <planeGeometry args={[1, 1, 1, 1]} />
+        <planeGeometry args={[1, 1, 32, 32]} />
       </mesh>
     </>
   );
